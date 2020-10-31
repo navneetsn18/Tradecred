@@ -2,3 +2,7 @@ numpy
 pandas
 gunicorn
 Flask
+Werkzeug
+flask-cors
+Flask-Cors
+flask_cors
