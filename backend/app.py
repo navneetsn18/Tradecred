@@ -1,5 +1,6 @@
 import os,json
 from flask import Flask, flash, request, redirect, url_for, session,jsonify
+from flask_session import Session
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
 import numpy as np
@@ -9,6 +10,12 @@ from datetime import date
 UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+SESSION_TYPE = "filesystem"
+PERMANENT_SESSION_LIFETIME = 1800
+app.config.update(SECRET_KEY=os.urandom(24))
+
+app.config.from_object(__name__)
+Session(app)
 
 @app.route('/result', methods=['GET'])
 def result():
@@ -74,5 +81,7 @@ def wrongfilefunction():
         outfile.write(json_object)
 
 if __name__ == "__main__":
-    app.secret_key = os.urandom(24)
+    with app.test_request_context("/"):
+        session["key"] = os.urandom(24)
     app.run(debug=True,port=int(os.environ.get('PORT',5000)))
+CORS(app, expose_headers='Authorization')

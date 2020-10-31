@@ -6,3 +6,5 @@ Werkzeug
 flask-cors
 Flask-Cors
 flask_cors
+Flask-Session
+xlrd
