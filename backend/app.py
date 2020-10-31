@@ -46,30 +46,36 @@ def workfunction(filename):
     file = pd.read_excel(filename)
     data = pd.DataFrame(file)
     result={}
-    result['Number_of_invoices']=int(data.count()[0])
-    newData = data.dropna(axis=0)
-    newData = newData[pd.to_datetime(data['Doc. Date'], errors='coerce') <= pd.to_datetime('today')]
-    newData = newData[pd.to_datetime(data['Pstng Date'], errors='coerce') <= pd.to_datetime('today')]
-    newData = newData[pd.to_datetime(data['Net due dt'], errors='coerce') >= pd.to_datetime(data['Pstng Date'])]
-    vendordata = {k:v for k,v in zip(newData['Vendor Code'],newData['Vendor name'])}
-    for i in newData.index:
-        if newData['Vendor Code'][i] in vendordata:
-            if newData['Vendor name'][i] != vendordata[newData['Vendor Code'][i]]:
-                newData.drop([i])
-    vendordata1 = {k:v for k,v in zip(newData['Vendor Code'],newData['Vendor name'])}
-    vendordata2 = {k:v for k,v in zip(newData['Vendor name'],newData['Vendor Code'])}
+    rownames=["Invoice Numbers","Document Number","Type","Net due dt","Doc. Date","Pstng Date","Amt in loc.cur.","Vendor Code","Vendor name","Vendor type"]
+    flag = True
+    for i in data:
+    if i not in rownames:
+        flag=False
+    if flag==True:
+        result['Number_of_invoices']=int(data.count()[0])
+        newData = data.dropna(axis=0)
+        newData = newData[pd.to_datetime(data['Doc. Date'], errors='coerce') <= pd.to_datetime('today')]
+        newData = newData[pd.to_datetime(data['Pstng Date'], errors='coerce') <= pd.to_datetime('today')]
+        newData = newData[pd.to_datetime(data['Net due dt'], errors='coerce') >= pd.to_datetime(data['Pstng Date'])]
+        vendordata = {k:v for k,v in zip(newData['Vendor Code'],newData['Vendor name'])}
+        for i in newData.index:
+            if newData['Vendor Code'][i] in vendordata:
+                if newData['Vendor name'][i] != vendordata[newData['Vendor Code'][i]]:
+                    newData.drop([i])
+        vendordata1 = {k:v for k,v in zip(newData['Vendor Code'],newData['Vendor name'])}
+        vendordata2 = {k:v for k,v in zip(newData['Vendor name'],newData['Vendor Code'])}
 
-    for i in newData.index:
-        if newData['Vendor name'][i] != vendordata1[newData['Vendor Code'][i]]:
-                newData.drop([i])
+        for i in newData.index:
+            if newData['Vendor name'][i] != vendordata1[newData['Vendor Code'][i]]:
+                    newData.drop([i])
 
-    for i in newData.index:
-        if newData['Vendor Code'][i] != vendordata2[newData['Vendor name'][i]]:
-                newData.drop([i])
-    result['Total_sum']=float(newData['Amt in loc.cur.'].sum())
-    df = newData.drop_duplicates(subset='Vendor name', keep="first")
-    result['No_Up']=int(df['Vendor name'].count())
-    result['Invalid']=int(data.shape[0]-newData.shape[0])
+        for i in newData.index:
+            if newData['Vendor Code'][i] != vendordata2[newData['Vendor name'][i]]:
+                    newData.drop([i])
+        result['Total_sum']=float(newData['Amt in loc.cur.'].sum())
+        df = newData.drop_duplicates(subset='Vendor name', keep="first")
+        result['No_Up']=int(df['Vendor name'].count())
+        result['Invalid']=int(data.shape[0]-newData.shape[0])
     json_object = json.dumps(result, indent = 4) 
     with open("data.json", "w") as outfile: 
         outfile.write(json_object)
