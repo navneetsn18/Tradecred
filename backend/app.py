@@ -46,11 +46,15 @@ def workfunction(filename):
     file = pd.read_excel(filename)
     data = pd.DataFrame(file)
     result={}
-    rownames=["Invoice Numbers","Document Number","Type","Net due dt","Doc. Date","Pstng Date","Amt in loc.cur.","Vendor Code","Vendor name","Vendor type"]
-    flag = True
+    rowsdata={}
     for i in data:
-    if i not in rownames:
-        flag=False
+        if i not in rowsdata:
+            rowsdata[i]=True
+    rownames=["Invoice Numbers","Net due dt","Doc. Date","Pstng Date","Amt in loc.cur.","Vendor Code","Vendor name"]
+    flag = True
+    for i in rownames:
+        if i not in rowsdata:
+            flag=False
     if flag==True:
         result['Number_of_invoices']=int(data.count()[0])
         newData = data.dropna(axis=0)
