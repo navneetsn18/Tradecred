@@ -76,6 +76,7 @@ def workfunction(filename):
         for i in newData.index:
             if newData['Vendor Code'][i] != vendordata2[newData['Vendor name'][i]]:
                     newData.drop([i])
+        newData = newData.drop_duplicates(['Invoice Numbers'])
         result['Total_sum']=float(newData['Amt in loc.cur.'].sum())
         df = newData.drop_duplicates(subset='Vendor name', keep="first")
         result['No_Up']=int(df['Vendor name'].count())
